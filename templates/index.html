@@ -9,25 +9,26 @@
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Search Engine</h1>
-        <form id="searchForm">
-            <div class="form-group">
-                <label for="query">Enter your search query:</label>
-                <input type="text" class="form-control" id="query" name="query">
-            </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="biWordCheckbox" name="biWordCheckbox" value="biWord">
-                <label class="form-check-label" for="biWordCheckbox">Bi-Word Index</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="positionalCheckbox" name="positionalCheckbox" value="positional">
-                <label class="form-check-label" for="positionalCheckbox">Positional Index</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="invertedCheckbox" name="invertedCheckbox" value="inverted">
-                <label class="form-check-label" for="invertedCheckbox">Inverted Index</label>
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Search</button>
-        </form>
+<form id="searchForm">
+    <div class="form-group">
+        <label for="query">Enter your search query:</label>
+        <input type="text" class="form-control" id="query" name="query">
+    </div>
+    <div class="form-check">
+        <input type="radio" class="form-check-input" id="biWordRadio" name="indexType" value="biWord">
+        <label class="form-check-label" for="biWordRadio">Bi-Word Index</label>
+    </div>
+    <div class="form-check">
+        <input type="radio" class="form-check-input" id="positionalRadio" name="indexType" value="positional">
+        <label class="form-check-label" for="positionalRadio">Positional Index</label>
+    </div>
+    <div class="form-check">
+        <input type="radio" class="form-check-input" id="invertedRadio" name="indexType" value="inverted">
+        <label class="form-check-label" for="invertedRadio">Inverted Index</label>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Search</button>
+</form>
+
 
         <div id="results" class="mt-5"></div>
     </div>
@@ -35,49 +36,45 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        document.getElementById('searchForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var query = document.getElementById('query').value;
-            var biWordCheckbox = document.getElementById('biWordCheckbox').checked;
-            var positionalCheckbox = document.getElementById('positionalCheckbox').checked;
-            var invertedCheckbox = document.getElementById('invertedCheckbox').checked;
-            search(query, biWordCheckbox, positionalCheckbox, invertedCheckbox);
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var query = document.getElementById('query').value;
+        var indexType = document.querySelector('input[name="indexType"]:checked').value;
+        search(query, indexType);
+    });
+
+    function search(query, indexType) {
+        var url = '/search?q=' + query + '&indexType=' + indexType;
+
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            displayResults(data.results);
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
+    }
 
-        function search(query, biWord, positional, inverted) {
-            var url = '/search?q=' + encodeURIComponent(query);
-            if (biWord) url += '&biWord=true';
-            if (positional) url += '&positional=true';
-            if (inverted) url += '&inverted=true';
+    function displayResults(results) {
+        var resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '';
 
-            fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                displayResults(data.results);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        if (results.length === 0) {
+            resultsDiv.innerHTML = 'No results found.';
+            return;
         }
 
-        function displayResults(results) {
-            var resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '';
+        var resultList = document.createElement('ul');
+        results.forEach(function(result) {
+            var listItem = document.createElement('li');
+            listItem.innerHTML = result; // Use innerHTML to interpret HTML tags
+            resultList.appendChild(listItem);
+        });
+        resultsDiv.appendChild(resultList);
+    }
+</script>
 
-            if (results.length === 0) {
-                resultsDiv.innerHTML = 'No results found.';
-                return;
-            }
-
-            var resultList = document.createElement('ul');
-            results.forEach(function(result) {
-                var listItem = document.createElement('li');
-                listItem.textContent = 'Document ID: ' + result;
-                resultList.appendChild(listItem);
-            });
-            resultsDiv.appendChild(resultList);
-        }
-    </script>
 </body>
 </html>
