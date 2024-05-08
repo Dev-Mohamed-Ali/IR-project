@@ -36,7 +36,7 @@ class PositionalIndex:
         for tokens in tokenized_sentences:
             file_indexes = []
             for token in tokens:
-                if token not in self.stop_words:
+                if token:
                     if token in self.index:
                         self.index[token][0] += 1
                         if file_index in self.index[token][1]:

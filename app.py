@@ -61,7 +61,7 @@ def search():
     index_type = request.args.get('indexType', '')
 
     # Tokenize the query and remove duplicates
-    tokens = list(set(preprocess_document(query)))
+    tokens = query.split(" ")
 
     # Initialize result set
     result_docs = set()
